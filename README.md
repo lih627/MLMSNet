@@ -2,7 +2,7 @@
 
 Lightweight Multi-Level Multi-Scale Feature Fusion Network for Semantic Segmentation.
 
-<iframe src="//player.bilibili.com/player.html?aid=503071536&bvid=BV1iN411o7So&cid=337256268&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+Demo video: [link](https://www.bilibili.com/video/BV1iN411o7So/)
 
 # Dataset Preparation
 
@@ -41,6 +41,8 @@ Lightweight Multi-Level Multi-Scale Feature Fusion Network for Semantic Segmenta
 4. `cityscapes_demo.txt`,` cityscapes_test.txt`,  `fine_train.txt` ,`fine_val.txt` is in `MLMSNet/misc`
 
 # Train
+
+
 
 ```shell
 cd path/to/MLMSNet
