@@ -40,34 +40,54 @@ def compute_speed(model, input_size, device, iteration):
                                                              iteration / elapsed_time * input_size[0]))
 
 
-def eval_baseline():
+def eval_baseline(speed=False):
     from model.baseline import BaselineNet
-    model = BaselineNet(mode='large', width_mult=1.0, atrous3=False, atrous4=False, zoom_factor=8, classes=19)
+    model = BaselineNet(mode='large', width_mult=1.0, atrous3=False, atrous4=False, zoom_factor=8, classes=19,
+                        pretrained=False)
     model.eval()
     inputs = torch.randn(1, 3, 713, 713)
     flops, params = profile(model, inputs=(inputs,))
     flops, params = clever_format([flops, params], "%.4f")
     print('Baseline Flops: {}, Params: {}'.format(flops, params))
-    device = list(range(torch.cuda.device_count()))[0]
-    print(device)
-    input_size = tuple([8, 3, 713, 713])
-    compute_speed(model, input_size, device, iteration=50)
+    if speed:
+        device = list(range(torch.cuda.device_count()))[0]
+        print(device)
+        input_size = tuple([8, 3, 713, 713])
+        compute_speed(model, input_size, device, iteration=50)
 
 
-def eval_mlms():
+def eval_mlms(speed=False):
     from model.mlmsnet import MLMSNet
-    model = MLMSNet(mode='large', width_mult=1.0, large=False, zoom_factor=8, use_msf=True, use_mlf=True)
+    model = MLMSNet(mode='large', width_mult=1.0, large=False, zoom_factor=8, use_msf=True, use_mlf=True,
+                    pretrained=False)
     model.eval()
     inputs = torch.randn(1, 3, 713, 713)
     flops, params = profile(model, inputs=(inputs,))
     flops, params = clever_format([flops, params], "%.4f")
     print('MLMS Flops: {}, Params: {}'.format(flops, params))
-    device = list(range(torch.cuda.device_count()))[0]
-    print(device)
-    input_size = tuple([8, 3, 713, 713])
-    compute_speed(model, input_size, device, iteration=50)
+    if speed:
+        device = list(range(torch.cuda.device_count()))[0]
+        print(device)
+        input_size = tuple([8, 3, 713, 713])
+        compute_speed(model, input_size, device, iteration=50)
+
+
+def eval_mlmsv2(speed=False):
+    from model.mlmsnetv2 import MLMSNetv2 as MLMSNet
+    model = MLMSNet(mode='large', width_mult=1.0, large=False, zoom_factor=8, use_msf=True, use_mlf=True,
+                    pretrained=False)
+    model.eval()
+    inputs = torch.randn(1, 3, 713, 713)
+    flops, params = profile(model, inputs=(inputs,))
+    flops, params = clever_format([flops, params], "%.4f")
+    print('MLMSv2 Flops: {}, Params: {}'.format(flops, params))
+    if speed:
+        device = list(range(torch.cuda.device_count()))[0]
+        input_size = tuple([8, 3, 713, 713])
+        compute_speed(model, input_size, device, iteration=50)
 
 
 if __name__ == '__main__':
-    eval_baseline()
+    # eval_baseline()
     eval_mlms()
+    eval_mlmsv2()

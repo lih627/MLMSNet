@@ -4,6 +4,14 @@ Lightweight Multi-Level Multi-Scale Feature Fusion Network for Semantic Segmenta
 
 Demo video: [link](https://www.bilibili.com/video/BV1iN411o7So/)
 
+# Update
+
+- Support 4 encoder: moiblenet large/small and width-multi 0.75/1.0.
+
+- Support mlmsnetv2, Use depth separable convolution for ASPP and SE block. (mobilenetv3 large backbone, width-multi 1.0) 713x713 input: Flops 14.2209G, Params 3.5739M.
+
+  
+
 # Dataset Preparation
 
 1. Download Cityscapes images from [Cityscape website](https://www.cityscapes-dataset.com/downloads/). We need **gtFine_trainvaltest.zip (241MB)** and **leftImg8bit_trainvaltest.zip (11GB)** . The **leftImg8bit_demoVideo.zip (6.6GB)** is optional, which is used to generate the demo segmentation results.
@@ -80,9 +88,9 @@ You can download pretrained models from [Google Drive](https://drive.google.com/
 
 | Model | val mIoU/mAcc/allAcc |config| link |
 | ----- | -------------------- |------|-------- |
-| MLMS-L      | 0.7268/0.7991/0.9540. |[cityscapes_ohem_large.yaml](./config/cityscapes_ohem_large.yaml)| [MLMS-L](https://drive.google.com/file/d/1JHf9nT4Hgcb3t3HVTd7gZQFN-J1epxym/view?usp=sharing) |
-|       |                      | |     |
-|       |                      | |    |
+| MLMS-L      | 0.7268/0.7991/0.9540. |[cityscapes_ohem_large.yaml](./config/cityscapes_ohem_large.yaml)| [MLMS_L](https://drive.google.com/file/d/1JHf9nT4Hgcb3t3HVTd7gZQFN-J1epxym/view?usp=sharing) |
+| MLMS-S | 0.7274/0.8033/0.9537 | [cityscapes_ohem_small.yaml](./config/cityscapes_ohem_small.yaml) | [MLMS_S](https://drive.google.com/file/d/1fYJWfeEwx2AhWKedFsopFTguhwBoWUIh/view?usp=sharing) |
+| MLMSv2-L | 0.7164/0.7982/0.9526 | [mlmsv2_large.yaml](./config/mlmsv2_large.yaml) | [MLMSv2_L](https://drive.google.com/file/d/1Rb2Q6nu5RyZkbKmDtlEQzFUY-E_8cMl2/view?usp=sharing) |
 
 
 

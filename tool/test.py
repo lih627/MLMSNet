@@ -93,6 +93,14 @@ def main():
                             use_msf=args.use_msf,
                             pretrained=False, classes=args.classes,
                             large=args.large)
+        elif args.arch == 'mlmsv2':
+            from model.mlmsnetv2 import MLMSNetv2 as MLMSNet
+            model = MLMSNet(mode=args.mode, width_mult=args.width_mult, zoom_factor=args.zoom_factor,
+                            use_mlf=args.use_mlf,
+                            use_msf=args.use_msf,
+                            pretrained=False, classes=args.classes,
+                            large=args.large)
+
         else:
             raise RuntimeError("=> not support arch {}".format(args.arch))
 

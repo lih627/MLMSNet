@@ -120,6 +120,13 @@ def main_worker(gpu, ngpus_per_node, argss):
                         criterion=criterion, classes=args.classes,
                         large=args.large)
         modules_ori, modules_new = model.get_train_params()
+    elif args.arch == 'mlmsv2':
+        from model.mlmsnetv2 import MLMSNetv2 as MLMSNet
+        model = MLMSNet(mode=args.mode, width_mult=args.width_mult, zoom_factor=args.zoom_factor, use_msf=args.use_msf,
+                        use_mlf=args.use_mlf,
+                        criterion=criterion, classes=args.classes,
+                        large=args.large)
+        modules_ori, modules_new = model.get_train_params()
     else:
         raise RuntimeError('Not support the arch {}'.format(args.arch))
     params_list = []
@@ -267,8 +274,16 @@ def train(train_loader, model, optimizer, epoch):
         target = target.cuda(non_blocking=True)
         output, main_loss, aux_loss = model(input, target)
         if not args.multiprocessing_distributed:
-            main_loss, aux_loss = torch.mean(main_loss), torch.mean(aux_loss)
-        loss = main_loss + args.aux_weight * aux_loss
+            if aux_loss is None:
+                main_loss = torch.mean(main_loss)
+                aux_loss = torch.zeros(main_loss.size()).type_as(main_loss)
+            else:
+                main_loss, aux_loss = torch.mean(main_loss), torch.mean(aux_loss)
+        if aux_loss is None:
+            aux_loss = torch.zeros(main_loss.size()).type_as(main_loss)
+            loss = main_loss
+        else:
+            loss = main_loss + args.aux_weight * aux_loss
 
         optimizer.zero_grad()
         loss.backward()
