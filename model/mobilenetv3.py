@@ -178,28 +178,15 @@ class MobileNetV3(nn.Module):
         self._initialize_weights()
 
     def forward(self, x):
-        features = []
-        print("here ")
         x = self.layer0(x)  # downsample 2
-        print(x.shape)
-        features.append(x)
         x = self.layer1(x)  # downsample 4
-        print(x.shape)
-        features.append(x)
         x = self.layer2(x)  # downsample 8
-        print(x.shape)
-
-        features.append(x)
         x = self.layer3(x)  # downsample 16
-        print(x.shape)
         x = self.layer4(x)  # downsample 32
-        print(x.shape)
         x = self.conv(x)
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        # for item in features:
-        #     print(item.shape)
         return x
 
     def _initialize_weights(self):
@@ -247,18 +234,19 @@ def mobilenetv3_large(**kwargs):
 def mobilenetv3_small(**kwargs):
     """
     Constructs a MobileNetV3-Small model
+    8x download factor
     """
     cfgs = [
         # k, t, c, SE, HS, s
         [[3, 1, 16, 1, 0, 2]],
         [[3, 4.5, 24, 0, 0, 2],
          [3, 3.67, 24, 0, 0, 1]],
-        [[5, 4, 40, 1, 1, 2],
+        [[5, 4, 40, 1, 1, 1],
          [5, 6, 40, 1, 1, 1],
          [5, 6, 40, 1, 1, 1],
          [5, 3, 48, 1, 1, 1],
          [5, 3, 48, 1, 1, 1]],
-        [[5, 6, 96, 1, 1, 2],
+        [[5, 6, 96, 1, 1, 1],
          [5, 6, 96, 1, 1, 1],
          [5, 6, 96, 1, 1, 1]],
     ]
@@ -305,6 +293,7 @@ def build_mobilenetv3_small(pretrained=True, width_mult=1.):
         else:
             raise RuntimeError("Not support width_mult: {}".format(width_mult))
         load_and_convert(net, state_dict)
+    return net
 
 
 if __name__ == '__main__':
@@ -315,7 +304,7 @@ if __name__ == '__main__':
         return sum(param.numel() for param in net.parameters())
 
 
-    net = build_mobilenetv3_large(width_mult=0.75)
+    net = build_mobilenetv3_large(pretrained=False, width_mult=0.75)
     img = torch.randn((1, 3, 224, 224))
     out = net(img)
     print('Out shape ', out.size())

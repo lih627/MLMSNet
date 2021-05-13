@@ -3,6 +3,14 @@ import torch.nn.functional as F
 import model.mobilenetv3 as models
 import torch
 
+def make_divisible(v, divisor, min_value=None):
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
+
 
 class ConvBNReLU(nn.Module):
     def __init__(self, in_chan, out_chan, ks=3, stride=1, padding=1, *args, **kwargs):
@@ -136,10 +144,16 @@ class MLMSNet(nn.Module):
 
         if mode == 'large':
             mobilenet = models.build_mobilenetv3_large(pretrained=pretrained, width_mult=width_mult)
-            if abs(width_mult - 1.0) < 1e-4:
-                self.cins = [40, 112, 160]
+            self.cins = [40, 112, 160]
+            for i, cin in enumerate(self.cins):
+                self.cins[i] = make_divisible(cin * width_mult, 8)
+        elif mode == 'small':
+            mobilenet = models.build_mobilenetv3_small(pretrained=pretrained, width_mult=width_mult)
+            self.cins = [24, 48, 96]
+            for i, cin in enumerate(self.cins):
+                self.cins[i] = make_divisible(cin * width_mult, 8)
         else:
-            raise RuntimeError('Not support small mobilenetv3')
+            raise NotImplementedError('not support mode {}'.format(mode))
 
         self.layer0, self.layer1, self.layer2, self.layer3, self.layer4 = (
             mobilenet.layer0, mobilenet.layer1, mobilenet.layer2,
@@ -161,8 +175,7 @@ class MLMSNet(nn.Module):
             nn.Conv2d(128 * up, classes, kernel_size=1)
         )
         if self.training:
-            if mode == 'large':
-                fea_in = int(112 * width_mult)
+            fea_in = self.cins[1]
 
             self.aux = nn.Sequential(
                 nn.Conv2d(fea_in, 64, kernel_size=3, padding=1, bias=False),
@@ -209,6 +222,7 @@ class MLMSNet(nn.Module):
             aux = self.aux(x_tmp)
             if self.zoom_factor != 1:
                 aux = F.interpolate(aux, size=(h, w), mode='bilinear', align_corners=True)
+            print(aux.size())
             main_loss = self.criterion(x, y)
             aux_loss = self.criterion(aux, y)
             return x.max(1)[1], main_loss, aux_loss
@@ -231,8 +245,8 @@ if __name__ == '__main__':
 
     os.environ["CUDA_VISIBLE_DEVICES"] = '0, 1'
     input = torch.rand(4, 3, 713, 713)
-    model = MLMSNet(mode='large', width_mult=1.0, dropout=0.1, classes=21, zoom_factor=8,
-                    use_msf=False, use_mlf=False, pretrained=True)
+    model = MLMSNet(mode='small', width_mult=1.0, dropout=0.1, classes=21, zoom_factor=8,
+                    use_msf=False, use_mlf=False, pretrained=False)
     model.eval()
     print(model)
     output = model(input)
