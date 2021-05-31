@@ -58,8 +58,8 @@ def eval_baseline(speed=False):
 
 def eval_mlms(speed=False):
     from model.mlmsnet import MLMSNet
-    model = MLMSNet(mode='large', width_mult=1.0, large=False, zoom_factor=8, use_msf=True, use_mlf=True,
-                    pretrained=False)
+    model = MLMSNet(mode='large', width_mult=1.0, large=True, zoom_factor=8, use_msf=True, use_mlf=True,
+                    pretrained=False, classes=11)
     model.eval()
     inputs = torch.randn(1, 3, 713, 713)
     flops, params = profile(model, inputs=(inputs,))
